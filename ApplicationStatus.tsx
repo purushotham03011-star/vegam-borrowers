@@ -1,102 +1,222 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { fetchApplicationStatus } from '../services/loanService';
+import { UserProfile } from '../types';
+import { 
+  ChevronDown, ChevronUp, AlertCircle, ChevronLeft, Package, 
+  Banknote, ImageIcon, Smartphone, Laptop, Bike, Car 
+} from 'lucide-react';
 
-const Avatar: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => (
-  <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 relative flex-shrink-0">
-    <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg flex items-center justify-center">
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-        <circle cx="50" cy="50" r="50" fill={gender === 'female' ? '#FCE7F3' : '#E0F2FE'} />
-        {/* Face */}
-        <path d="M30 45 C30 70 70 70 70 45 C70 25 30 25 30 45" fill="#FFDFC4" />
-        <path d="M30 40 L30 50 L28 50 C25 50 25 40 28 40 Z" fill="#FFDFC4" /> {/* Ear L */}
-        <path d="M70 40 L70 50 L72 50 C75 50 75 40 72 40 Z" fill="#FFDFC4" /> {/* Ear R */}
-        
-        {/* Hair */}
-        {gender === 'female' ? (
-           <path d="M20 45 C20 10 80 10 80 45 C80 65 85 80 85 90 L15 90 C15 80 20 65 20 45" fill="#374151" />
-        ) : (
-           <path d="M25 40 C25 15 75 15 75 40 C75 45 75 35 70 30 C60 10 40 10 30 30 C25 35 25 45 25 40" fill="#1F2937" />
-        )}
-        
-        {/* Eyes */}
-        <circle cx="40" cy="48" r="2" fill="#1F2937" />
-        <circle cx="60" cy="48" r="2" fill="#1F2937" />
-        
-        {/* Smile */}
-        <path d="M40 60 Q50 65 60 60" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" fill="none" />
-        
-        {/* Body */}
-        <path d="M20 90 Q50 110 80 90 L80 100 L20 100 Z" fill={gender === 'female' ? '#EC4899' : '#3B82F6'} />
-      </svg>
-    </div>
-  </div>
-);
+interface ApplicationStatusProps {
+  user: UserProfile;
+  onBack: () => void;
+}
 
-const ReviewCard: React.FC<{ name: string; text: string; gender: 'male' | 'female' }> = ({ name, text, gender }) => (
-  <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 flex flex-col h-full min-h-[250px] md:min-h-0">
-    <Avatar gender={gender} />
-    <div className="flex-grow flex items-center justify-center">
-      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4 md:mb-6 text-center italic line-clamp-4 md:line-clamp-none">
-        "{text}"
-      </p>
-    </div>
-    <div className="mt-auto pt-4 border-t border-gray-100 text-center">
-      <h4 className="font-bold text-gray-900 font-serif text-base md:text-lg">{name}</h4>
-    </div>
-  </div>
-);
+export const ApplicationStatus: React.FC<ApplicationStatusProps> = ({ user, onBack }) => {
+  const [loading, setLoading] = useState(true);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-export const TestimonialsSection = () => {
-  const reviews = [
-    {
-      name: "Manasa",
-      gender: "female" as const,
-      text: "Excellent services and amazing customer service. Team is very responsive and I really appreciate their customer relationship."
-    },
-    {
-      name: "Praneeth",
-      gender: "male" as const,
-      text: "Excellent hassle-free loan service. My loan got approved, processed and disbursed in just couple of hours. Recommended!"
-    },
-    {
-      name: "Kishore",
-      gender: "male" as const,
-      text: "The service given by the company is excellent. Within short time quick approval with disbursements process is quite smooth."
-    },
-    {
-      name: "Pranay",
-      gender: "male" as const,
-      text: "Great service! I got my loan within 20 minutes of documents collection. The folks here are friendly and get the job done!"
-    }
-  ];
+  useEffect(() => {
+    const loadStatus = async () => {
+      if (!user.id) {
+        setError("User ID not found.");
+        setLoading(false);
+        return;
+      }
+      try {
+        const data = await fetchApplicationStatus(user.id);
+        setApplications(data || []);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStatus();
+  }, [user.id]);
 
-  return (
-    <section className="py-16 md:py-20 bg-gray-50 border-t border-gray-100 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 md:mb-16">
-          <h2 className="text-2xl sm:text-4xl font-serif font-bold text-gray-900 uppercase tracking-wide mb-4">
-            Customer's Saying
-          </h2>
-          <div className="w-24 h-1.5 bg-violet-600 mx-auto rounded-full"></div>
-        </div>
-        
-        {/* Responsive Layout: Horizontal Scroll Snap on Mobile, Grid on Desktop */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-6 md:grid md:grid-cols-2 lg:grid-cols-4 md:space-x-0 md:pb-0 no-scrollbar">
-          {reviews.map((review, index) => (
-            <div key={index} className="min-w-[80vw] sm:min-w-[300px] md:min-w-0 snap-center">
-              <ReviewCard {...review} />
-            </div>
-          ))}
-        </div>
-        
-        {/* Mobile Swipe Indicator */}
-        <div className="flex justify-center gap-2 mt-2 md:hidden">
-           <div className="w-2 h-2 rounded-full bg-violet-600"></div>
-           <div className="w-2 h-2 rounded-full bg-violet-200"></div>
-           <div className="w-2 h-2 rounded-full bg-violet-200"></div>
-           <div className="w-2 h-2 rounded-full bg-violet-200"></div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center">
+        <div className="bg-red-50 p-6 rounded-2xl text-red-600 border border-red-100 flex flex-col items-center">
+          <AlertCircle className="w-10 h-10 mb-2" />
+          <p>{error}</p>
+          <button onClick={onBack} className="mt-4 text-sm underline hover:text-red-800">Go Back</button>
         </div>
       </div>
-    </section>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-8">
+       <button onClick={onBack} className="flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-6">
+          <ChevronLeft className="h-5 w-5 mr-1" /> Back to Dashboard
+       </button>
+       
+       <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Application Status</h1>
+       <p className="text-gray-500 mb-8">Track your submitted loan requests.</p>
+
+       {applications.length === 0 ? (
+         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-100">
+            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">No applications found.</p>
+            <p className="text-sm text-gray-400 mt-1">Start a new loan request from the dashboard.</p>
+         </div>
+       ) : (
+         <div className="space-y-6">
+           {applications.map((app) => (
+             <StatusCard key={app.id} application={app} />
+           ))}
+         </div>
+       )}
+    </div>
   );
 };
+
+const getAssetIcon = (subCategory: string | undefined) => {
+  switch (subCategory) {
+    case 'mobile': return <Smartphone className="w-6 h-6 text-violet-600" />;
+    case 'laptop': return <Laptop className="w-6 h-6 text-violet-600" />;
+    case 'bike': return <Bike className="w-6 h-6 text-orange-500" />;
+    case 'car': return <Car className="w-6 h-6 text-orange-500" />;
+    default: return <Package className="w-6 h-6 text-gray-400" />;
+  }
+};
+
+const formatAssetName = (subCategory: string | undefined, category: string | undefined) => {
+  if (subCategory) {
+    // Capitalize first letter (e.g. mobile -> Mobile)
+    return subCategory.charAt(0).toUpperCase() + subCategory.slice(1);
+  }
+  if (category) {
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  }
+  return 'Unknown Asset';
+};
+
+const StatusCard: React.FC<{ application: any }> = ({ application }) => {
+  const [isAssetExpanded, setIsAssetExpanded] = useState(false);
+  const { asset_details: asset, loan_requested: loan } = application;
+
+  const dateStr = new Date(application.created_at).toLocaleDateString('en-IN', {
+    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex justify-between items-start mb-2">
+           <h3 className="text-lg font-bold text-gray-900">{application.name}</h3>
+           <span className="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">
+             Pending Review
+           </span>
+        </div>
+        <p className="text-xs text-gray-400">Submitted on: {dateStr}</p>
+      </div>
+
+      <div className="p-6 space-y-6">
+
+        {/* 1. Asset Details Dropdown (Moved to Top) */}
+        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+          <button 
+            onClick={() => setIsAssetExpanded(!isAssetExpanded)}
+            className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors"
+          >
+             <div className="flex items-center gap-4">
+               <div className={`p-2 rounded-lg bg-opacity-10 ${['bike','car'].includes(asset?.subCategory) ? 'bg-orange-100' : 'bg-violet-100'}`}>
+                 {getAssetIcon(asset?.subCategory)}
+               </div>
+               <div className="text-left">
+                  <p className="text-base font-bold text-gray-900">
+                    {formatAssetName(asset?.subCategory, asset?.category)}
+                  </p>
+                  <p className="text-xs text-gray-500 font-medium">{asset?.brand} {asset?.model}</p>
+               </div>
+             </div>
+             {isAssetExpanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+          </button>
+          
+          {isAssetExpanded && (
+            <div className="p-4 bg-gray-50 border-t border-gray-200 text-sm space-y-3 animate-in slide-in-from-top-2">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                 <DetailRow label="Brand" value={asset?.brand} />
+                 <DetailRow label="Model" value={asset?.model} />
+                 
+                 {asset?.category === 'electronics' ? (
+                   <>
+                     <DetailRow label="RAM" value={asset?.ram} />
+                     <DetailRow label="Storage" value={asset?.storage} />
+                     <DetailRow label="Condition" value={asset?.condition} />
+                   </>
+                 ) : (
+                   <>
+                     <DetailRow label="Year" value={asset?.year} />
+                     <DetailRow label={asset?.subCategory === 'bike' ? "Engine CC" : "Mileage"} value={asset?.subCategory === 'bike' ? asset?.engineCC : asset?.mileage} />
+                     <DetailRow label="Fuel Type" value={asset?.fuelType} />
+                     <DetailRow label="RC Available" value={asset?.hasRC ? "Yes" : "No"} />
+                     <DetailRow label="Insurance" value={asset?.hasInsurance ? "Yes" : "No"} />
+                   </>
+                 )}
+              </div>
+
+              {/* Photos */}
+              {asset?.photoNames && asset.photoNames.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-xs font-bold text-gray-500 mb-2 flex items-center gap-1">
+                    <ImageIcon className="w-3 h-3" /> Uploaded Photos
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {asset.photoNames.map((name: string, i: number) => (
+                      <span key={i} className="px-2 py-1 bg-white border border-gray-200 rounded text-xs text-gray-600 truncate max-w-[150px]">
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {/* 2. Loan Requested Section (Moved Below Asset) */}
+        <div>
+          <h4 className="flex items-center text-sm font-bold text-violet-600 mb-3 uppercase tracking-wider">
+            <Banknote className="w-4 h-4 mr-2" /> Loan Details
+          </h4>
+          <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+             <div className="text-center md:text-left">
+               <p className="text-xs text-gray-500 mb-1">Amount</p>
+               <p className="font-bold text-gray-900 text-lg">₹{loan?.amount?.toLocaleString()}</p>
+             </div>
+             <div className="text-center md:text-left border-l border-gray-200 pl-4">
+               <p className="text-xs text-gray-500 mb-1">Tenure</p>
+               <p className="font-bold text-gray-900">{loan?.durationValue} {loan?.durationUnit}</p>
+             </div>
+             <div className="text-center md:text-left border-l border-gray-200 pl-4">
+               <p className="text-xs text-gray-500 mb-1">Interest</p>
+               <p className="font-bold text-gray-900">{loan?.interestRate}%</p>
+             </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  );
+};
+
+const DetailRow = ({ label, value }: { label: string, value: string | number }) => (
+  <div className="flex flex-col">
+    <span className="text-xs text-gray-500">{label}</span>
+    <span className="font-semibold text-gray-800">{value || '--'}</span>
+  </div>
+);

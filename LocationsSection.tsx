@@ -1,130 +1,83 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 
-// The Logo Component for the FAQ
-const FAQLogo = ({ isOpen }: { isOpen: boolean }) => (
-  <svg 
-    width="28" 
-    height="28" 
-    viewBox="0 0 64 64" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    className={`transition-all duration-500 ease-out transform ${isOpen ? 'rotate-90' : 'rotate-0'}`}
-  >
-    {/* Shadow - changes color on open */}
-    <path 
-      d="M4 12 L44 32 L4 52 L16 32 Z" 
-      fill={isOpen ? "#A78BFA" : "#CBD5E1"} // Violet Light vs Slate Light
-      className="transition-colors duration-500"
-      transform="translate(-2, 2)"
-    />
+// Custom 3D Map Pin SVG - White/Orange Theme
+const RedMapPin = () => (
+  <svg width="100" height="120" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform hover:scale-110 transition-transform duration-500 drop-shadow-lg scale-75 md:scale-100">
+     {/* Shadow Base on the 'floor' */}
+    <ellipse cx="50" cy="110" rx="20" ry="6" fill="black" fillOpacity="0.2" filter="blur(6px)"/>
+
+    {/* 3D Pin Body - Outer Shape with Gradient */}
+    <path d="M50 0C22.3858 0 0 22.3858 0 50C0 85 50 120 50 120C50 120 100 85 100 50C100 22.3858 77.6142 0 50 0Z" fill="white"/>
     
-    {/* Main Body - changes color on open */}
-    <path 
-      d="M10 10 L54 32 L10 54 L24 32 Z" 
-      fill={isOpen ? "#8B5CF6" : "#F1F5F9"} // Violet vs Slate 100
-      stroke={isOpen ? "#7C3AED" : "#94A3B8"} 
-      strokeWidth="6" 
-      strokeLinejoin="round"
-      className="transition-colors duration-500"
-    />
+    {/* Inner Bevel/Edge for 3D depth */}
+    <path d="M50 5C26 5 6 25 6 50C6 80 50 115 50 115" stroke="#F97316" strokeWidth="2" strokeLinecap="round" opacity="0.3"/>
+
+    {/* Inner Hole */}
+    <circle cx="50" cy="45" r="18" fill="#EA580C"/> {/* Orange 600 */}
+    <circle cx="50" cy="45" r="10" fill="white"/>
+
+    {/* Glossy Highlights */}
+    <ellipse cx="25" cy="25" rx="10" ry="15" transform="rotate(-45 25 25)" fill="white" fillOpacity="0.5"/>
   </svg>
 );
 
-interface FAQItemProps {
-  question: string;
-  answer: React.ReactNode;
-}
-
-const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="border-b border-gray-100 last:border-0">
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-6 flex items-center justify-between text-left group"
-      >
-        <span className={`text-lg font-medium transition-colors duration-300 ${isOpen ? 'text-violet-600' : 'text-gray-700 group-hover:text-violet-600'}`}>
-          {question}
-        </span>
-        <div className="ml-4 flex-shrink-0">
-          <FAQLogo isOpen={isOpen} />
-        </div>
-      </button>
-      <div 
-        className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 pb-6' : 'grid-rows-[0fr] opacity-0 pb-0'}`}
-      >
-        <div className="overflow-hidden">
-          <div className="text-gray-600 leading-relaxed pr-8 pl-1 border-l-2 border-violet-200 ml-1">
-            {answer}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const FAQSection = () => {
-  const faqs: FAQItemProps[] = [
-    {
-      question: "1 What Is Collateral?",
-      answer: (
-        <>
-          <p className="mb-3">Collateral is a valuable asset that a borrower pledges as security for a loan, serving thus as a guarantee for the lender.</p>
-          <p>For example, For a car loan, the vehicle is the collateral. A business that obtains financing from a bank may pledge valuable equipment or real estate owned by the business as collateral for the loan. In the event of a default, the lender can seize the collateral and sell it to recoup the loss.</p>
-        </>
-      )
-    },
-    {
-      question: "2- Key Takeaways.",
-      answer: (
-        <ul className="list-none space-y-2">
-          <li className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 bg-violet-500 rounded-full mt-2 flex-shrink-0"></span>
-            Collateral reduces the risk for lenders.
-          </li>
-          <li className="flex items-start gap-2">
-             <span className="w-1.5 h-1.5 bg-violet-500 rounded-full mt-2 flex-shrink-0"></span>
-            If a borrower defaults on the loan, the lender can seize the collateral and sell it to recoup its losses.
-          </li>
-          <li className="flex items-start gap-2">
-             <span className="w-1.5 h-1.5 bg-violet-500 rounded-full mt-2 flex-shrink-0"></span>
-            Mortgages and car loans are two types of collateralized loans.
-          </li>
-          <li className="flex items-start gap-2">
-             <span className="w-1.5 h-1.5 bg-violet-500 rounded-full mt-2 flex-shrink-0"></span>
-            Other personal assets, such as a savings or investment account, can be used to secure a collateralized personal loan.
-          </li>
-        </ul>
-      )
-    },
-    {
-      question: "3- Can I get a loan based on collateral?",
-      answer: "Yes, financial institutions provide loans against collateral security, where borrowers pledge assets to access funds. The loan amount, interest rate, and tenure depend on the collateral type, its value, and the lender's assessment criteria."
-    },
-    {
-      question: "4- How do I make my loan payments?",
-      answer: "Payment methods will vary depending on the lender and the type of loan you have. Some lenders may allow you to make payments online, while others may require you to send a check or money order by mail. Be sure to carefully review the terms and conditions of your loan to understand your payment options."
-    }
+export const LocationsSection = () => {
+  const locations = [
+    { name: "Anantapur", delay: "delay-0" },
+    { name: "Vizag", delay: "delay-100" },
+    { name: "Bangalore", delay: "delay-200" }
   ];
 
   return (
-    <section id="faq" className="py-24 bg-gray-50 scroll-mt-20 border-t border-gray-100 relative overflow-hidden">
-       {/* Background Decoration */}
-      <div className="absolute top-0 left-0 -ml-20 -mt-20 w-96 h-96 bg-violet-100/50 rounded-full blur-3xl pointer-events-none"></div>
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-serif font-bold text-gray-900 mb-4">Frequently asked questions.</h2>
-          <div className="w-24 h-1.5 bg-gradient-to-r from-violet-600 to-purple-600 mx-auto rounded-full"></div>
+    <section className="py-16 md:py-24 bg-gradient-to-r from-orange-400 to-red-500 relative overflow-hidden">
+      {/* Background ambient light */}
+      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-white/20 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-4 md:gap-8 items-center">
+          
+          {/* Part 1: Big Text Description */}
+          {/* On Mobile: Col-span-3 (Full width), On Desktop: Col-span-1 */}
+          <div className="col-span-3 md:col-span-1 text-center md:text-left relative z-10 mb-8 md:mb-0">
+            <h2 className="text-3xl md:text-3xl lg:text-5xl font-serif font-bold text-white leading-tight drop-shadow-md">
+              Our <br/>
+              Locations <br/>
+              in India
+            </h2>
+            <div className="w-24 h-1.5 bg-white rounded-full mt-4 md:mt-6 mx-auto md:mx-0 shadow-sm"></div>
+            <p className="mt-4 md:mt-6 text-white/90 leading-relaxed text-sm lg:text-base font-medium hidden md:block">
+              We are expanding our digital lending footprint. Visit our partner hubs for physical verification and secure asset storage.
+            </p>
+          </div>
+
+          {/* Parts 2, 3, 4: Locations with Pins */}
+          {/* On Mobile: 1 Col each (Total 3 cols side by side) */}
+          {locations.map((loc) => (
+            <div key={loc.name} className="col-span-1 flex flex-col items-center justify-center group">
+               {/* 3D Map Base Plate Effect */}
+               <div className="relative">
+                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-16 h-16 md:w-28 md:h-28 bg-white/20 rounded-full transform rotate-x-[60deg] border border-white/30 group-hover:bg-white/30 transition-all duration-500"></div>
+                 
+                 {/* The Pin */}
+                 <div className="relative z-10 -translate-y-2 group-hover:-translate-y-6 transition-transform duration-500 ease-out cursor-pointer">
+                   <RedMapPin />
+                 </div>
+               </div>
+               
+               {/* Location Name */}
+               <h3 className="mt-2 md:mt-6 text-sm md:text-xl lg:text-2xl font-bold text-white group-hover:text-yellow-200 transition-colors font-serif tracking-wide drop-shadow-sm text-center">
+                 {loc.name}
+               </h3>
+            </div>
+          ))}
+
         </div>
         
-        <div className="bg-white rounded-3xl p-4 sm:p-8 shadow-xl border border-gray-100">
-          {faqs.map((faq, index) => (
-            <FAQItem key={index} question={faq.question} answer={faq.answer} />
-          ))}
-        </div>
+        {/* Mobile only text description bottom */}
+        <p className="mt-8 text-white/90 leading-relaxed text-sm text-center md:hidden px-4">
+             Expanding our digital footprint to partner hubs near you.
+        </p>
       </div>
     </section>
   );

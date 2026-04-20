@@ -1,157 +1,53 @@
 
-import React, { useState } from 'react';
-import { Menu, X, LogOut } from 'lucide-react';
-import { AppStep } from '../types';
+import React from 'react';
+import { ChevronRight, LucideIcon } from 'lucide-react';
 
-interface HeaderProps {
-  onNavigate: (step: AppStep) => void;
-  currentStep: AppStep;
-  isLoggedIn: boolean;
-  onLogout: () => void;
+interface AssetCardProps {
+  title: string;
+  MainIcon: LucideIcon;
+  gradient: string;
+  options: { label: string; value: string; icon?: LucideIcon }[];
+  onSelect: (subCategory: any) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onNavigate, currentStep, isLoggedIn, onLogout }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const scrollToSection = (id: string) => {
-    setIsMobileMenuOpen(false); // Close menu on click
-    if (currentStep !== AppStep.LANDING) {
-      // If we are logged in, we might stay on Dashboard/Status, but if user wants to see "About" 
-      // which is on Landing, we navigate there. 
-      // However, usually for SPA, we might want to keep the header simple.
-      // If user clicks "About" while logged in, let's go to Landing.
-      onNavigate(AppStep.LANDING);
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
-  const handleMobileNav = (action: () => void) => {
-    setIsMobileMenuOpen(false);
-    action();
-  };
-
-  const handleApplicationStatusClick = () => {
-    if (isLoggedIn) {
-      onNavigate(AppStep.APPLICATION_STATUS);
-    } else {
-      onNavigate(AppStep.LOGIN);
-    }
-  };
-
+export const AssetCard: React.FC<AssetCardProps> = ({ title, MainIcon, gradient, options, onSelect }) => {
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 transition-all duration-300 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 md:h-20">
-          {/* Logo */}
-          <div 
-            className="flex items-center cursor-pointer group"
-            onClick={() => isLoggedIn ? onNavigate(AppStep.DASHBOARD) : scrollToSection('hero')}
-          >
-            <div className="mr-2 md:mr-3 transform group-hover:scale-110 transition-transform duration-300">
-              {/* Custom 3D Arrow Shape Logo */}
-              <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="md:w-[42px] md:h-[42px]">
-                <path d="M4 12 L44 32 L4 52 L16 32 Z" fill="#2DD4BF" opacity="0.8" transform="translate(-2, 2)"/>
-                <path d="M10 10 L54 32 L10 54 L24 32 Z" fill="#99F6E4" stroke="#1F2937" strokeWidth="6" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span className="text-lg md:text-xl font-bold text-gray-900 tracking-wide font-serif">
-              Vegam
-            </span>
-          </div>
+    <div className="relative group bg-white rounded-3xl p-6 shadow-xl hover:shadow-2xl hover:shadow-violet-200 transition-all duration-500 border border-gray-100 overflow-hidden h-auto md:h-96 flex flex-col justify-between">
+      
+      {/* Decorative Gradient Blob */}
+      <div className={`absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-10 group-hover:scale-110 transition-transform duration-700 ${gradient}`} />
+      <div className={`absolute bottom-0 left-0 w-full h-1.5 ${gradient}`} />
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <nav className="flex gap-8">
-              {!isLoggedIn && (
-                <>
-                  <button onClick={() => scrollToSection('about')} className="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">About</button>
-                  <button onClick={() => scrollToSection('how-it-works')} className="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">How it Works</button>
-                </>
-              )}
-              {isLoggedIn && (
-                 <button onClick={() => onNavigate(AppStep.DASHBOARD)} className="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Dashboard</button>
-              )}
-              <button onClick={() => onNavigate(AppStep.LOGIN)} className="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Asset Estimation</button>
-              <button onClick={handleApplicationStatusClick} className="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Application Status</button>
-            </nav>
-            
-            {isLoggedIn ? (
-              <button 
-                onClick={onLogout}
-                className="flex items-center gap-2 bg-gray-100 text-gray-700 px-5 py-2.5 rounded-full font-semibold hover:bg-gray-200 transition-all text-sm border border-gray-200"
-              >
-                <LogOut size={16} /> Logout
-              </button>
-            ) : (
-              currentStep === AppStep.LANDING && (
-                <button 
-                  onClick={() => onNavigate(AppStep.LOGIN)}
-                  className="bg-violet-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-violet-700 transition-all transform hover:-translate-y-0.5 shadow-md shadow-violet-200 text-sm"
-                >
-                  Login
-                </button>
-              )
-            )}
-          </div>
-          
-           {/* Mobile Menu Button */}
-           <div className="md:hidden">
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-           </div>
+      {/* Header Content */}
+      <div className="relative z-10 text-center mt-2 md:mt-4 mb-6 md:mb-0">
+        <div className={`w-16 h-16 md:w-20 md:h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 md:mb-6 text-white shadow-lg transform group-hover:-translate-y-1 transition-transform duration-300 ${gradient}`}>
+          <MainIcon className="h-8 w-8 md:h-10 md:w-10" />
         </div>
+        <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-1 md:mb-2">{title}</h3>
+        <p className="text-gray-500 text-xs md:text-sm">Select your specific item below</p>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl animate-in slide-in-from-top-5 fade-in duration-200">
-          <nav className="flex flex-col p-4 space-y-4">
-             {!isLoggedIn && (
-               <>
-                 <button onClick={() => handleMobileNav(() => scrollToSection('about'))} className="text-left px-4 py-3 rounded-xl hover:bg-violet-50 text-gray-700 font-medium">About</button>
-                 <button onClick={() => handleMobileNav(() => scrollToSection('how-it-works'))} className="text-left px-4 py-3 rounded-xl hover:bg-violet-50 text-gray-700 font-medium">How it Works</button>
-               </>
-             )}
-             {isLoggedIn && (
-               <button onClick={() => handleMobileNav(() => onNavigate(AppStep.DASHBOARD))} className="text-left px-4 py-3 rounded-xl hover:bg-violet-50 text-gray-700 font-medium">Dashboard</button>
-             )}
-             <button onClick={() => handleMobileNav(() => onNavigate(AppStep.LOGIN))} className="text-left px-4 py-3 rounded-xl hover:bg-violet-50 text-gray-700 font-medium">Asset Estimation</button>
-             <button onClick={() => handleMobileNav(handleApplicationStatusClick)} className="text-left px-4 py-3 rounded-xl hover:bg-violet-50 text-gray-700 font-medium">Application Status</button>
-             
-             {isLoggedIn ? (
-               <button 
-                 onClick={() => handleMobileNav(onLogout)}
-                 className="w-full bg-gray-100 text-gray-800 px-6 py-4 rounded-xl font-bold text-center mt-2 flex items-center justify-center gap-2"
-               >
-                 <LogOut size={18} /> Logout
-               </button>
-             ) : (
-               currentStep === AppStep.LANDING && (
-                 <button 
-                   onClick={() => handleMobileNav(() => onNavigate(AppStep.LOGIN))}
-                   className="w-full bg-violet-600 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-violet-200 text-center mt-2"
-                 >
-                   Login / Get Started
-                 </button>
-               )
-             )}
-          </nav>
-        </div>
-      )}
-    </header>
+      {/* Options List */}
+      <div className="relative z-10 space-y-3 mt-0 md:mt-4">
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(opt.value);
+            }}
+            className="w-full bg-gray-50 hover:bg-white text-gray-700 hover:text-violet-600 border border-transparent hover:border-violet-100 rounded-xl px-4 py-3 md:px-5 md:py-4 flex items-center justify-between transition-all duration-300 shadow-sm hover:shadow-md group/btn"
+          >
+            <span className="font-semibold text-sm md:text-base flex items-center gap-3">
+              {opt.icon && <opt.icon className="h-4 w-4 md:h-5 md:w-5 text-gray-400 group-hover/btn:text-violet-500 transition-colors" />}
+              {opt.label}
+            </span>
+            <div className="bg-white group-hover/btn:bg-violet-50 p-1 md:p-1.5 rounded-full transition-colors text-gray-400 group-hover/btn:text-violet-500 border border-gray-100 group-hover/btn:border-violet-100">
+              <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };
